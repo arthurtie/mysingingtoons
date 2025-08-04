@@ -1,8 +1,10 @@
 --!strict
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local ReplicaServer = require(script.Parent.ReplicaServer)
 local Types = require(ReplicatedStorage.Shared.Modules.Types)
 local NetWork = require(ReplicatedStorage.Shared.Modules.Network)
 local StateManager = require(ReplicatedStorage.Shared.Modules.StateManager)
+local ReplicaService = require(script.Parent.ReplicaServer)
 type module = {}
 local module: module = {}
 
@@ -56,11 +58,12 @@ export type PlayerObj = {
 		},
 		[any]: any,
 	},
+	Replica: ReplicaServer.Replica,
 	Tycoon: Tycoon?,
 	Player: Player,
 	Leaderstats: Folder,
-	StateObj: StateManager.PlayerObj,
-	Update: () -> (),
+	StateObj: StateManager.StateObject,
+	Update: (PlayerObj) -> (),
 }
 export type PlayerService = {
 	Name: string,
@@ -73,7 +76,7 @@ export type PlayerService = {
 }
 export type GameService = {
 	Plots: { Tycoon },
-	Network: NetWork.NetWork,
+	Network: NetWork.Network,
 	Start: (PlayerService) -> (),
 }
 

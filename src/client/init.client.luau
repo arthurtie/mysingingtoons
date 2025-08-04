@@ -1,7 +1,13 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local StateManager = require(ReplicatedStorage.Shared.Modules.StateManager)
 StateManager:CreateObj("Player")
-print(StateManager)
+local Controllers = {}
 for _, v in script:GetChildren() do
-	require(v)
+	table.insert(Controllers, require(v))
+end
+
+for _, v in Controllers do
+	if type(v.Start) == "function" then
+		v:Start()
+	end
 end

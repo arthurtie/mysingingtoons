@@ -5,5 +5,10 @@ Settings[1] = {
 	Audio = 123456789,
 	id = 1,
 }
+Settings[2] = {
+	Name = "Donald",
+	Audio = 123456789,
+	id = 1,
+}
 
 return Settings

@@ -8,6 +8,7 @@ local Service = { Plots = {}, Network = Network.new("GameService") }
 
 local _, RE = Service.Network:AddRE("Place")
 RE:Connect(function(plr, id, CFrame)
+	id = tonumber(id)
 	print(plr, id, CFrame)
 	local PlayerObj = PlayerService:GetPlayer(plr)
 	if not PlayerObj then
@@ -19,12 +20,16 @@ RE:Connect(function(plr, id, CFrame)
 		print(plr, "Not in plot while trying to build")
 		return
 	end
+	print(Settings)
 	if not Settings.Character[id] then
 		print("Settings for id: " .. id .. "does not exist")
 		return
 	end
 
 	CFrame = PlayerObj.Tycoon.Instance.Base.CFrame:ToObjectSpace(CFrame)
+	if PlayerObj.Player.Character:FindFirstChild(id) then
+		PlayerObj.Player.Character:FindFirstChild(id):Destroy()
+	end
 
 	PlayerObj.Tycoon:AddCharacter(id, CFrame)
 end)

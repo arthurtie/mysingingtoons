@@ -2,6 +2,7 @@ local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerScriptService = game:GetService("ServerScriptService")
 
+local ReplicaServer = require(script.Parent.ReplicaServer)
 local Network = require(ReplicatedStorage.Shared.Modules.Network)
 local StateManager = require(ReplicatedStorage.Shared.Modules.StateManager)
 local Types = require(script.Parent.Types)
@@ -90,14 +91,21 @@ function Service:LoadPlayer(Player)
 		Profile = Profile,
 		Player = Player,
 		Leaderstats = Leaderstats,
-		Update = function()
+		Update = function(self)
 			UpdateLeaderboardStats()
-			ServiceNetwork:GetRE("Update"):Fire(Player, Profile.Data.Money)
+
+			self.Replica:SetValues({ "Profile" }, self.Profile.Data)
 		end,
 		Friendlys = {},
 		Friends = {},
 		StateObj = StateManager:CreateObj("Player_" .. Player.UserId),
+		Replica = ReplicaServer.New({
+			Token = ReplicaServer.Token("PlayerData"),
+			Tags = { UserId = Player.UserId },
+			Data = { Profile = Profile.Data },
+		}),
 	}
+	self.Profiles[Player.UserId].Replica:Replicate()
 
 	for _, v in GameService.Plots do
 		print(v)
@@ -106,7 +114,10 @@ function Service:LoadPlayer(Player)
 		end
 	end
 
-	task.delay(5, self.Profiles[Player.UserId].Update, self.Profiles[Player.UserId])
+	task.delay(5, function()
+		self.Profiles[Player.UserId].Profile.Data.Money += 25
+		self.Profiles[Player.UserId]:Update()
+	end)
 
 	return self.Profiles[Player.UserId]
 end

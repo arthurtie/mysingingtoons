@@ -1,13 +1,8 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local DataController = require(script.Parent.DataController)
 local fusion = require(ReplicatedStorage.Packages.fusion)
 
 local module = {}
 
-function module:Start()
-	DataController:Subscribe(function(data)
-		print(data)
-	end)
-end
+function module.text() end
 
 return module

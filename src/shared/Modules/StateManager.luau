@@ -1,16 +1,16 @@
 --!strict
 export type Manager = {
 	__index: Manager,
-	StateObjects: { [string]: StateObjects },
-	CreateObj: (Manager, string) -> StateObjects?,
-	GetObj: (Manager, string) -> StateObjects?,
-	GetState: (StateObjects, string) -> any,
-	SetState: (StateObjects, string, any) -> (),
-	Subscribe: (StateObjects, string, (any) -> ()) -> (() -> ())?,
-	Destroy: (StateObjects) -> (),
+	StateObjects: { [string]: StateObject },
+	CreateObj: (Manager, string) -> StateObject?,
+	GetObj: (Manager, string) -> StateObject?,
+	GetState: (StateObject, string) -> any,
+	SetState: (StateObject, string, any) -> (),
+	Subscribe: (StateObject, string, (any) -> ()) -> (() -> ())?,
+	Destroy: (StateObject) -> (),
 }
 
-export type StateObjects = typeof(setmetatable(
+export type StateObject = typeof(setmetatable(
 	{} :: { Name: string, States: { [string]: { Value: any, Subscriptions: { (any) -> ...any } } } },
 	{} :: Manager
 ))

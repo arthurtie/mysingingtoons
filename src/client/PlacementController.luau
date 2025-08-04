@@ -1,15 +1,17 @@
-local ExperienceStateRecordingService = game:GetService("ExperienceStateRecordingService")
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 local UserInputService = game:GetService("UserInputService")
+local DataController = require(script.Parent.DataController)
 local Types = require(script.Parent.Types)
 local Network = require(ReplicatedStorage.Shared.Modules.Network)
 local StateManager = require(ReplicatedStorage.Shared.Modules.StateManager)
 local PlayerStates = StateManager:GetObj("Player")
 local Player = Players.LocalPlayer
-local PlacementController = { Rotation = 0 } :: Types.PlacementController
 
+local UIController = {} :: Types.UIController
+
+local PlacementController = { Rotation = 0 } :: Types.PlacementController
 repeat
 	task.wait()
 until Network:GetNetwork("GameService")
@@ -90,6 +92,16 @@ RunService.Heartbeat:Connect(function()
 		:Lerp(CFrame.new(Position) * CFrame.Angles(0, math.rad(PlacementController.Rotation), 0), 0.5)
 
 	Object:PivotTo(CFrame)
+end)
+
+Player.CharacterAdded:Connect(function()
+	Player.Backpack.ChildAdded:Connect(function()
+		PlayerStates:SetState("Placing", false)
+	end)
+
+	Player.Backpack.ChildRemoved:Connect(function(child)
+		PlacementController:StartPlacing(child.Name)
+	end)
 end)
 
 return PlacementController

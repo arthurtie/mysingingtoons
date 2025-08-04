@@ -1,6 +1,7 @@
 --!strict
 local CollectionService = game:GetService("CollectionService")
 local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerScriptService = game:GetService("ServerScriptService")
 local PlayerService = require(ServerScriptService.Server.PlayerService)
 local GameService = require(ServerScriptService.Server.GameService)
@@ -87,6 +88,8 @@ function Component:Claim(plr)
 		character:PivotTo(self.Instance.Base.CFrame + Vector3.new(0, 2, 0))
 	end)
 
+	obj.Replica:Set({ "Tycoon" }, self.Instance)
+
 	return true
 end
 
@@ -104,9 +107,16 @@ function Component:UnClaim()
 	self.Player = nil
 end
 
-function Component:AddCharacter(id, CFrame)
-	CFrame = self.Instance.Base.CFrame:ToWorldSpace(CFrame)
-	local NewCharacter = CharComp.new(self, id, CFrame)
+function Component:AddCharacter(id, CF)
+	local Instance = ReplicatedStorage.Assets.Characters:FindFirstChild(id)
+	if not Instance then
+		return
+	end
+	local _, Size = Instance:GetBoundingBox()
+	CF = self.Instance.Base.CFrame:ToWorldSpace(CF)
+	local YPos = self.Instance.Base.Position.Y + Size.Y * 0.5
+	CF = CFrame.new(Vector3.new(math.round(CF.Position.X), YPos, math.round(CF.Position.Z))) * CF.Rotation
+	local NewCharacter = CharComp.new(self, id, CF)
 	if NewCharacter then
 		table.insert(self.Characters, NewCharacter)
 	end

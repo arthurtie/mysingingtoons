@@ -2,24 +2,15 @@
 local RunService = game:GetService("RunService")
 local REServer = require(script.REServer)
 local REClient = require(script.REClient)
-export type Net = {
-	__index: Net,
-	new: (string) -> NetWork?,
-	NetWorks: { [string]: NetWork },
-	Update: RemoteEvent,
-	AddRE: (NetWork, string) -> (RemoteEvent, REServer.Event)?,
-	GetNetwork: (Net, string) -> NetWork,
-	GetRE: (NetWork, string) -> REServer.Event | REClient.Event,
-}
+local Types = require(script.Types)
 
-export type NetWork = typeof(setmetatable(
-	{} :: { ServerEvents: { [string]: REServer.Event }, ClientEvents: { [string]: REClient.Event }, Name: string },
-	{} :: Net
-))
+export type Network = Types.NetWork
+export type Net = Types.Net
 
 local Net = {
 	NetWorks = {},
-} :: Net
+	Types = Types,
+} :: Types.Net
 Net.__index = Net
 
 if RunService:IsServer() then
@@ -55,7 +46,7 @@ function Net.new(Name)
 	end
 	local Table = { Name = Name, ServerEvents = {}, ClientEvents = {} }
 	Net.NetWorks[Name] = setmetatable(Table, Net)
-	return Net.NetWorks[Name] :: NetWork
+	return Net.NetWorks[Name]
 end
 
 function Net:AddRE(Name)
