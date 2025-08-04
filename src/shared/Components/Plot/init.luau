@@ -1,5 +1,6 @@
 --!strict
 local CollectionService = game:GetService("CollectionService")
+local Players = game:GetService("Players")
 local ServerScriptService = game:GetService("ServerScriptService")
 local PlayerService = require(ServerScriptService.Server.PlayerService)
 local GameService = require(ServerScriptService.Server.GameService)
@@ -19,7 +20,34 @@ function Component.new(instance)
 
 	Table.HitBox.Parent = Table.Instance
 	Table.HitBox.Size = Vector3.new(25, 25, 25)
-	Table.HitBox.Position = Table.Instance.Base.Positon + Vector3.new(0, 12.5, 0)
+	Table.HitBox.Position = Table.Instance.Base.Position + Vector3.new(0, 12.5, 0)
+	Table.HitBox.Anchored = true
+	Table.HitBox.CanCollide = false
+	Table.HitBox.Touched:Connect(function(part)
+		if not part.Parent or not Players:GetPlayerFromCharacter(part.Parent) then
+			return
+		end
+
+		local PlayerObj = PlayerService:GetPlayer(Players:GetPlayerFromCharacter(part.Parent))
+		if PlayerObj.Player.UserId ~= Table.Player then
+			return
+		end
+
+		PlayerObj.StateObj:SetState("InPlot", true)
+	end)
+
+	Table.HitBox.TouchEnded:Connect(function(part)
+		if not part.Parent or not Players:GetPlayerFromCharacter(part.Parent) then
+			return
+		end
+
+		local PlayerObj = PlayerService:GetPlayer(Players:GetPlayerFromCharacter(part.Parent))
+		if PlayerObj.Player.UserId ~= Table.Player then
+			return
+		end
+
+		PlayerObj.StateObj:SetState("InPlot", false)
+	end)
 
 	setmetatable(Table, Component)
 
