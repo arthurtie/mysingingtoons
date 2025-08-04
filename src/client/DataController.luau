@@ -1,9 +1,6 @@
 local Players = game:GetService("Players")
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local StateManager = require(ReplicatedStorage.Shared.Modules.StateManager)
 local ReplicaClient = require(script.Parent.ReplicaClient)
 local Types = require(script.Parent.Types)
-local PlayerStates = StateManager:GetObj("Player")
 local module = { Subscribtions = {} } :: Types.DataController
 
 function module:Start()

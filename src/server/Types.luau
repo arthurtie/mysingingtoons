@@ -4,7 +4,6 @@ local ReplicaServer = require(script.Parent.ReplicaServer)
 local Types = require(ReplicatedStorage.Shared.Modules.Types)
 local NetWork = require(ReplicatedStorage.Shared.Modules.Network)
 local StateManager = require(ReplicatedStorage.Shared.Modules.StateManager)
-local ReplicaService = require(script.Parent.ReplicaServer)
 type module = {}
 local module: module = {}
 
