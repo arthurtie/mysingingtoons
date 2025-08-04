@@ -1,4 +1,33 @@
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local ServerScriptService = game:GetService("ServerScriptService")
 local Types = require(script.Parent.Types)
-local Service = { Plots = {} } :: Types.GameService
+local Network = require(ReplicatedStorage.Shared.Modules.Network)
+local Settings = require(ReplicatedStorage.Shared.Modules.Settings)
+local PlayerService = {} :: Types.PlayerService
+local Service = { Plots = {}, Network = Network.new("GameService") }
+
+local _, RE = Service.Network:AddRE("Place")
+RE:Connect(function(plr, id, position)
+	local PlayerObj = PlayerService:GetPlayer(plr)
+	if not PlayerObj then
+		print("PlayerObj for ", plr, " does not exist")
+		return
+	end
+	print(PlayerObj)
+	if not PlayerObj.StateObj:GetState("InPlot") then
+		print(plr, "Not in plot while trying to build")
+		return
+	end
+	if not Settings.Character[id] then
+		print("Settings for id: " .. id .. "does not exist")
+		return
+	end
+
+	PlayerObj.Tycoon:AddCharacter(id, position)
+end)
+
+function Service:Start()
+	PlayerService = require(script.Parent.PlayerService)
+end
 
 return Service :: Types.GameService

@@ -1,5 +1,4 @@
 --!strict
-local ExperienceStateRecordingService = game:GetService("ExperienceStateRecordingService")
 export type Manager = {
 	__index: Manager,
 	Players: { [string]: PlayerObj },
@@ -28,7 +27,7 @@ function Manager:CreateObj(name)
 	setmetatable(PlayerObj, Manager)
 
 	Manager.Players[name] = PlayerObj
-
+	print(PlayerObj)
 	return PlayerObj
 end
 
@@ -53,7 +52,7 @@ function Manager:SetState(State, Value)
 end
 
 function Manager:GetState(State)
-	if type(State) ~= "string" then
+	if type(State) ~= "string" or not self.States[State] then
 		return
 	end
 	return self.States[State].Value

@@ -14,7 +14,12 @@ function Component.new(instance)
 		Claimed = true,
 		Player = nil,
 		Characters = {},
+		HitBox = Instance.new("Part"),
 	}
+
+	Table.HitBox.Parent = Table.Instance
+	Table.HitBox.Size = Vector3.new(25, 25, 25)
+	Table.HitBox.Position = Table.Instance.Base.Positon + Vector3.new(0, 12.5, 0)
 
 	setmetatable(Table, Component)
 

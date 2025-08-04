@@ -1,6 +1,8 @@
 --!strict
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Types = require(ReplicatedStorage.Shared.Modules.Types)
+local NetWork = require(ReplicatedStorage.Shared.Modules.Network)
+local StateManager = require(ReplicatedStorage.Shared.Modules.StateManager)
 type module = {}
 local module: module = {}
 
@@ -8,12 +10,18 @@ export type TycoonComp = {
 	__index: TycoonComp,
 	Claim: (Tycoon, Player) -> (),
 	UnClaim: (Tycoon) -> (),
-	new: (Instance) -> Tycoon,
+	new: (typeof(workspace.Plots["1"])) -> Tycoon,
 	AddCharacter: (Tycoon, number, CFrame) -> (),
 }
 
 export type Tycoon = typeof(setmetatable(
-	{} :: { Claimed: boolean, Player: number?, Instance: typeof(workspace.Plots["1"]), Characters: { Character } },
+	{} :: {
+		Claimed: boolean,
+		Player: number?,
+		Instance: typeof(workspace.Plots["1"]),
+		Characters: { Character },
+		HitBox: Part,
+	},
 	{} :: TycoonComp
 ))
 
@@ -51,6 +59,7 @@ export type PlayerObj = {
 	Tycoon: Tycoon?,
 	Player: Player,
 	Leaderstats: Folder,
+	StateObj: StateManager.PlayerObj,
 	Update: () -> (),
 }
 export type PlayerService = {
@@ -64,6 +73,7 @@ export type PlayerService = {
 }
 export type GameService = {
 	Plots: { Tycoon },
+	Network: NetWork.NetWork,
 	Start: (PlayerService) -> (),
 }
 

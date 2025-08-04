@@ -1,6 +1,5 @@
-local Types = require(script.Parent.Types)
 local Settings = {}
 
-Settings.Character = table.freeze(require(script.Character)) :: Types.CharacterSettings
+Settings.Character = table.freeze(require(script.Character)) :: { { Name: string, Audio: number, id: number } }
 
 return Settings

@@ -3,6 +3,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerScriptService = game:GetService("ServerScriptService")
 
 local Network = require(ReplicatedStorage.Shared.Modules.Network)
+local StateManager = require(ReplicatedStorage.Shared.Modules.StateManager)
 local Types = require(script.Parent.Types)
 local Utils = require(ReplicatedStorage.Shared.Modules.Utils)
 local profilestore = require(ServerScriptService.Packages.ProfileStore)
@@ -95,6 +96,7 @@ function Service:LoadPlayer(Player)
 		end,
 		Friendlys = {},
 		Friends = {},
+		StateObj = StateManager:CreateObj("Player_" .. Player.UserId),
 	}
 
 	for _, v in GameService.Plots do
@@ -115,7 +117,7 @@ function Service:Remove(Player)
 	end
 	local Profile = Service:GetPlayer(Player)
 	if Profile.Tycoon then
-		Profile.Tycoon:Unclaim()
+		Profile.Tycoon:UnClaim()
 	end
 	Profile.Profile.Data.LastSeen = os.time()
 	Profile.Profile:EndSession()

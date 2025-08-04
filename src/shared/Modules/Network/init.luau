@@ -2,17 +2,17 @@
 local RunService = game:GetService("RunService")
 local REServer = require(script.REServer)
 local REClient = require(script.REClient)
-type Net = {
+export type Net = {
 	__index: Net,
 	new: (string) -> NetWork?,
 	NetWorks: { [string]: NetWork },
 	Update: RemoteEvent,
-	AddRE: (NetWork, string) -> RemoteEvent?,
+	AddRE: (NetWork, string) -> (RemoteEvent, REServer.Event)?,
 	GetNetwork: (Net, string) -> NetWork,
 	GetRE: (NetWork, string) -> REServer.Event | REClient.Event,
 }
 
-type NetWork = typeof(setmetatable(
+export type NetWork = typeof(setmetatable(
 	{} :: { ServerEvents: { [string]: REServer.Event }, ClientEvents: { [string]: REClient.Event }, Name: string },
 	{} :: Net
 ))
@@ -63,6 +63,11 @@ function Net:AddRE(Name)
 		warn("Cannot create remote event from client")
 		return
 	end
+
+	if self.ServerEvents[Name] then
+		warn("RE with that name already exists")
+		return
+	end
 	local RE = Instance.new("RemoteEvent")
 	RE.Name = Name
 	RE.Parent = script
@@ -70,7 +75,7 @@ function Net:AddRE(Name)
 
 	Net.Update:FireAllClients(self.Name, RE)
 
-	return self.ServerEvents[Name].Event
+	return self.ServerEvents[Name].Event, self.ServerEvents[Name]
 end
 
 function Net:GetNetwork(Name)
