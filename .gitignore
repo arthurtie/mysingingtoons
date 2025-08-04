@@ -1,0 +1,11 @@
+# Project place file
+/GameBase.rbxlx
+/Build.rbxlx
+/Place.rbxlx
+# Roblox Studio lock files
+/*.rbxlx.lock
+/*.rbxl.lock
+
+wally.lock
+sourcemap.json
+selene.toml
