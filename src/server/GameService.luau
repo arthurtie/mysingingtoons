@@ -7,7 +7,8 @@ local PlayerService = {} :: Types.PlayerService
 local Service = { Plots = {}, Network = Network.new("GameService") }
 
 local _, RE = Service.Network:AddRE("Place")
-RE:Connect(function(plr, id, position)
+RE:Connect(function(plr, id, CFrame)
+	print(plr, id, CFrame)
 	local PlayerObj = PlayerService:GetPlayer(plr)
 	if not PlayerObj then
 		print("PlayerObj for ", plr, " does not exist")
@@ -23,11 +24,13 @@ RE:Connect(function(plr, id, position)
 		return
 	end
 
-	PlayerObj.Tycoon:AddCharacter(id, position)
+	CFrame = PlayerObj.Tycoon.Instance.Base.CFrame:ToObjectSpace(CFrame)
+
+	PlayerObj.Tycoon:AddCharacter(id, CFrame)
 end)
 
 function Service:Start()
-	PlayerService = require(script.Parent.PlayerService)
+	PlayerService = require(ServerScriptService.Server.PlayerService)
 end
 
 return Service :: Types.GameService

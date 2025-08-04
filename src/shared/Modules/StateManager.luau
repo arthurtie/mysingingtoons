@@ -1,21 +1,21 @@
 --!strict
 export type Manager = {
 	__index: Manager,
-	Players: { [string]: PlayerObj },
-	CreateObj: (Manager, string) -> PlayerObj?,
-	GetObj: (Manager, string) -> PlayerObj?,
-	GetState: (PlayerObj, string) -> any,
-	SetState: (PlayerObj, string, any) -> (),
-	Subscribe: (PlayerObj, string, (any) -> ()) -> (() -> ())?,
-	Destroy: (PlayerObj) -> (),
+	StateObjects: { [string]: StateObjects },
+	CreateObj: (Manager, string) -> StateObjects?,
+	GetObj: (Manager, string) -> StateObjects?,
+	GetState: (StateObjects, string) -> any,
+	SetState: (StateObjects, string, any) -> (),
+	Subscribe: (StateObjects, string, (any) -> ()) -> (() -> ())?,
+	Destroy: (StateObjects) -> (),
 }
 
-export type PlayerObj = typeof(setmetatable(
+export type StateObjects = typeof(setmetatable(
 	{} :: { Name: string, States: { [string]: { Value: any, Subscriptions: { (any) -> ...any } } } },
 	{} :: Manager
 ))
 
-local Manager = { Players = {} } :: Manager
+local Manager = { StateObjects = {} } :: Manager
 Manager.__index = Manager
 
 function Manager:CreateObj(name)
@@ -26,8 +26,7 @@ function Manager:CreateObj(name)
 	local PlayerObj = { States = {}, Name = name }
 	setmetatable(PlayerObj, Manager)
 
-	Manager.Players[name] = PlayerObj
-	print(PlayerObj)
+	Manager.StateObjects[name] = PlayerObj
 	return PlayerObj
 end
 
@@ -35,16 +34,21 @@ function Manager:GetObj(name)
 	if not name or type(name) ~= "string" then
 		return
 	end
-
-	return Manager.Players[name]
+	return Manager.StateObjects[name]
 end
 
 function Manager:SetState(State, Value)
-	if type(State) ~= "string" or not Value then
+	if type(State) ~= "string" or Value == nil then
 		return
 	end
-
-	self.States[State].Value = Value
+	if not self.States[State] then
+		self.States[State] = { Value = Value, Subscriptions = {} }
+	else
+		if self.States[State].Value == Value then
+			return
+		end
+		self.States[State].Value = Value
+	end
 
 	for _, v in self.States[State].Subscriptions do
 		v(Value)
@@ -65,8 +69,7 @@ function Manager:Subscribe(name, callback)
 	end
 
 	if not self.States[name] then
-		warn("State does not exist")
-		return
+		self.States[name] = { Value = nil, Subscriptions = {} }
 	end
 
 	local id = #self.States[name].Subscriptions + 1
@@ -78,7 +81,7 @@ function Manager:Subscribe(name, callback)
 end
 
 function Manager:Destroy()
-	Manager.Players[self.Name] = nil
+	Manager.StateObjects[self.Name] = nil
 	setmetatable({ self }, {})
 	for i, _ in pairs(self) do
 		self[i] = nil

@@ -23,6 +23,8 @@ function Component.new(instance)
 	Table.HitBox.Position = Table.Instance.Base.Position + Vector3.new(0, 12.5, 0)
 	Table.HitBox.Anchored = true
 	Table.HitBox.CanCollide = false
+	Table.HitBox.Transparency = 1
+	Table.HitBox.CanQuery = false
 	Table.HitBox.Touched:Connect(function(part)
 		if not part.Parent or not Players:GetPlayerFromCharacter(part.Parent) then
 			return
@@ -47,6 +49,7 @@ function Component.new(instance)
 		end
 
 		PlayerObj.StateObj:SetState("InPlot", false)
+		print(PlayerObj.StateObj:GetState("InPlot"))
 	end)
 
 	setmetatable(Table, Component)
@@ -68,7 +71,6 @@ function Component:Claim(plr)
 	obj.Tycoon = self
 	for _, v in obj.Profile.Data.Characters do
 		local CFrame = CFrame.new(table.unpack(v.CFrame))
-		CFrame = self.Instance.Base.CFrame:ToWorldSpace(v.CFrame)
 		self:AddCharacter(v.id, CFrame)
 	end
 
@@ -103,6 +105,7 @@ function Component:UnClaim()
 end
 
 function Component:AddCharacter(id, CFrame)
+	CFrame = self.Instance.Base.CFrame:ToWorldSpace(CFrame)
 	local NewCharacter = CharComp.new(self, id, CFrame)
 	if NewCharacter then
 		table.insert(self.Characters, NewCharacter)

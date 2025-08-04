@@ -119,6 +119,7 @@ function Service:Remove(Player)
 	if Profile.Tycoon then
 		Profile.Tycoon:UnClaim()
 	end
+	Profile.StateObj:Destroy()
 	Profile.Profile.Data.LastSeen = os.time()
 	Profile.Profile:EndSession()
 	self.Profiles[Player.UserId] = nil

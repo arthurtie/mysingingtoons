@@ -1,17 +1,7 @@
 --!strict
-type module = {
-	__index: module,
-	new: (RemoteEvent) -> Event,
-	Fire: (Event, Player, ...any) -> (),
-	Connect: (Event, (...any) -> ...any) -> (() -> ())?,
-	Once: (Event, (...any) -> ...any) -> (() -> ())?,
-	Destroy: (Event) -> (),
-	FireAll: (Event) -> (),
-}
+local Types = require(script.Parent.Types)
 
-export type Event = typeof(setmetatable({} :: { Event: RemoteEvent, Connections: { (...any) -> ...any } }, {} :: module))
-
-local Module = {} :: module
+local Module = {} :: Types.EventModule
 Module.__index = Module
 
 function Module.new(RemoteEvent)
@@ -23,13 +13,13 @@ function Module.new(RemoteEvent)
 		Table:Destroy()
 	end)
 
-	RemoteEvent.OnServerEvent:Connect(function(...)
+	RemoteEvent.OnServerEvent:Connect(function(plr, ...)
 		for _, v in Table.Connections do
-			task.spawn(v, ...)
+			task.spawn(v, plr, ...)
 		end
 	end)
 
-	return Table :: Event
+	return Table
 end
 
 function Module:Fire(Player, ...)
