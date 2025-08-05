@@ -18,7 +18,7 @@ export type NetWork = typeof(setmetatable(
 export type EventModule = {
 	__index: EventModule,
 	new: (RemoteEvent) -> Event,
-	Fire: (Event, Player, ...any) -> (),
+	Fire: (Event, Player | any, ...any) -> (),
 	Connect: (Event, (...any) -> ...any) -> (() -> ())?,
 	Once: (Event, (...any) -> ...any) -> (() -> ())?,
 	Destroy: (Event) -> (),

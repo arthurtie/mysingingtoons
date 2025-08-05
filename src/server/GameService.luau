@@ -1,26 +1,26 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerScriptService = game:GetService("ServerScriptService")
+local Workspace = game:GetService("Workspace")
 local Types = require(script.Parent.Types)
 local Network = require(ReplicatedStorage.Shared.Modules.Network)
 local Settings = require(ReplicatedStorage.Shared.Modules.Settings)
 local PlayerService = {} :: Types.PlayerService
 local Service = { Plots = {}, Network = Network.new("GameService") }
 
-local _, RE = Service.Network:AddRE("Place")
-RE:Connect(function(plr, id, CFrame)
+function Service:PlaceObject(plr, id, CFrame)
 	id = tonumber(id)
-	print(plr, id, CFrame)
+
 	local PlayerObj = PlayerService:GetPlayer(plr)
 	if not PlayerObj then
 		print("PlayerObj for ", plr, " does not exist")
 		return
 	end
-	print(PlayerObj)
+
 	if not PlayerObj.StateObj:GetState("InPlot") then
 		print(plr, "Not in plot while trying to build")
 		return
 	end
-	print(Settings)
+
 	if not Settings.Character[id] then
 		print("Settings for id: " .. id .. "does not exist")
 		return
@@ -32,6 +32,26 @@ RE:Connect(function(plr, id, CFrame)
 	end
 
 	PlayerObj.Tycoon:AddCharacter(id, CFrame)
+end
+
+function Service:RemoveObject(plr, id) end
+
+local _, RE = Service.Network:AddRE("Place")
+RE:Connect(function(plr, id, CFrame)
+	Service:PlaceObject(plr, id, CFrame)
+end)
+
+local _, TeleportRE = Service.Network:AddRE("Teleport")
+TeleportRE:Connect(function(plr, Destination)
+	local PlayerObj = PlayerService:GetPlayer(plr)
+	if not PlayerObj then
+		return
+	end
+	if Destination == "Plot" and not PlayerObj.StateObj:GetState("InPlot") then
+		plr.Character:PivotTo(PlayerService:GetPlayer(plr).Tycoon.Instance.Base.CFrame + Vector3.new(0, 5, 0))
+	elseif Destination == "Shop" then
+		plr.Character:PivotTo(Workspace.Shop.CFrame + Vector3.new(0, 5, 0))
+	end
 end)
 
 function Service:Start()

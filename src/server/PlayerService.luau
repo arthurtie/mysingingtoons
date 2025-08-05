@@ -24,6 +24,7 @@ local Store = profilestore.New("0.0.1", {
 	PlayTimeReward = false,
 	Favorite = false,
 	Tutorial = 0,
+	Gems = 0,
 	Tools = { "Bat" },
 })
 
@@ -87,7 +88,7 @@ function Service:LoadPlayer(Player)
 	Value.Name = "Cash"
 	Value.Value = Utils.en(Profile.Data.Money)
 
-	self.Profiles[Player.UserId] = {
+	Service.Profiles[Player.UserId] = {
 		Profile = Profile,
 		Player = Player,
 		Leaderstats = Leaderstats,
@@ -105,19 +106,20 @@ function Service:LoadPlayer(Player)
 			Data = { Profile = Profile.Data },
 		}),
 	}
-	self.Profiles[Player.UserId].Replica:Replicate()
 
 	for _, v in GameService.Plots do
-		print(v)
 		if v:Claim(Player) then
 			break
 		end
 	end
 
-	task.delay(5, function()
-		self.Profiles[Player.UserId].Profile.Data.Money += 25
-		self.Profiles[Player.UserId]:Update()
-	end)
+	repeat
+		task.wait()
+	until ReplicaServer.ReadyPlayers[Player]
+
+	Service.Profiles[Player.UserId].Replica:Subscribe(Player)
+
+	self.Profiles[Player.UserId]:Update()
 
 	return self.Profiles[Player.UserId]
 end

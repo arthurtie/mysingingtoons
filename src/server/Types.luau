@@ -41,6 +41,7 @@ export type Character = typeof(setmetatable(
 export type PlayerObj = {
 	Profile: {
 		Data: {
+			Gems: number,
 			Money: number,
 			Multiplier: number,
 			Rebirth: number,
@@ -77,6 +78,8 @@ export type GameService = {
 	Plots: { Tycoon },
 	Network: NetWork.Network,
 	Start: (PlayerService) -> (),
+	PlaceObject: (Player, number, CFrame) -> (),
+	RemoveObject: (Player, number) -> (),
 }
 
 return module

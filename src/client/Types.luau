@@ -14,12 +14,13 @@ export type DataController = {
 	Start: (DataController) -> (),
 	GetData: (DataController) -> PlayerObj,
 	Replica: ReplicaClient.Replica,
-	Subscribe: (DataController) -> () -> (),
+	Subscribe: (DataController, (PlayerObj) -> ()) -> () -> (),
 	Subscribtions: { (any) -> () },
 }
 export type PlayerObj = {
 	Profile: {
 		Money: number,
+		Gems: number,
 		Multiplier: number,
 		Rebirth: number,
 		Inventory: {},

@@ -8,6 +8,6 @@ end
 
 for _, v in Controllers do
 	if type(v.Start) == "function" then
-		v:Start()
+		task.spawn(v.Start, v)
 	end
 end

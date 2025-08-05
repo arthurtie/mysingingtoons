@@ -21,6 +21,12 @@ function module:Start()
 end
 
 function module:GetData()
+	if not self.Replica then
+		repeat
+			task.wait()
+			print(1)
+		until self.Replica
+	end
 	return self.Replica.Data
 end
 
