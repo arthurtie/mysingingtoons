@@ -50,7 +50,6 @@ function Component.new(instance)
 		end
 
 		PlayerObj.StateObj:SetState("InPlot", false)
-		print(PlayerObj.StateObj:GetState("InPlot"))
 	end)
 
 	setmetatable(Table, Component)
