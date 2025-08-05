@@ -6,7 +6,6 @@ realm = "shared"
 
 [dependencies]
 fusion = "elttob/fusion@0.3.0"
-suphi-packet-main = "rajden28/suphi-packet-main@1.7.1"
 
 [server-dependencies]
 ProfileStore = "lm-loleris/profilestore@1.0.3"
