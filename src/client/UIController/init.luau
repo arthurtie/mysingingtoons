@@ -10,6 +10,7 @@ local Scope = fusion.scoped(fusion)
 local module = {}
 local Frames = {}
 
+--requires modules and inits the modules
 for _, v in script:GetChildren() do
 	Frames[v.Name] = require(v)
 end
@@ -20,6 +21,7 @@ for _, v in Frames do
 	end
 end
 
+--Connects the side buttons to the frames
 Scope:Hydrate(Frames.SideButtons.Settings.Button)({
 	[OnEvent("MouseButton1Click")] = function()
 		for _, v in Frames do
@@ -41,6 +43,7 @@ Scope:Hydrate(Frames.SideButtons.RobuxShop.Button)({
 	end,
 })
 
+--Subscribes to player data and renders ui
 function module:Start()
 	DataController:Subscribe(function(data)
 		Frames.Stats.Money:set(Utils.en(data.Profile.Money))

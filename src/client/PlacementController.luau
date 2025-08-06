@@ -61,10 +61,6 @@ function PlacementController:StopPlacing()
 end
 
 UserInputService.InputBegan:Connect(function(input)
-	if input.KeyCode == Enum.KeyCode.P then
-		PlacementController:StartPlacing(1)
-	end
-
 	if input.KeyCode == Enum.KeyCode.R then
 		PlacementController.Rotation += 90
 	end
