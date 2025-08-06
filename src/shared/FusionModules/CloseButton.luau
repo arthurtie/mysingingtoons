@@ -1,7 +1,7 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local fusion = require(ReplicatedStorage.Packages.fusion)
 
-return function(Scope: fusion.Scope<typeof(fusion)>)
+return function(Scope: fusion.Scope<typeof(fusion)>, Visible: fusion.Value<boolean>)
 	local Size = Scope:Value(UDim2.fromScale(0.12, 0.12))
 	return Scope:New("TextButton")({
 		Name = "Close",
@@ -24,6 +24,9 @@ return function(Scope: fusion.Scope<typeof(fusion)>)
 		end,
 		[fusion.OnEvent("MouseButton1Up")] = function()
 			Size:set(UDim2.fromScale(0.15, 0.15))
+		end,
+		[fusion.OnEvent("MouseButton1Click")] = function()
+			Visible:set(false)
 		end,
 		[fusion.Children] = {
 			Scope:New("UICorner")({
