@@ -8,6 +8,7 @@ return function(Scope: fusion.Scope<typeof(fusion)>)
 		Position = UDim2.fromScale(0, 0.45),
 		Size = UDim2.fromScale(0.1, 0.45),
 		BackgroundTransparency = 1,
+		Name = "Side",
 		[fusion.Children] = {
 			Scope:New("UIListLayout")({
 				HorizontalAlignment = "Center",

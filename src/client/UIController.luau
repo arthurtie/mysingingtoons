@@ -1,10 +1,10 @@
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local UserInputService = game:GetService("UserInputService")
 local DataController = require(script.Parent.DataController)
 local fusion = require(ReplicatedStorage.Packages.fusion)
-local CloseButton = require(ReplicatedStorage.Shared.FusionModules.CloseButton)
-local FrameModule = require(ReplicatedStorage.Shared.FusionModules.Frame)
+local Setting = require(ReplicatedStorage.Shared.FusionModules.Setting)
+local SettingsFrame = require(ReplicatedStorage.Shared.FusionModules.SettingsFrame)
+local ShopFrame = require(ReplicatedStorage.Shared.FusionModules.ShopFrame)
 local SideButton = require(ReplicatedStorage.Shared.FusionModules.SideButton)
 local SideFrame = require(ReplicatedStorage.Shared.FusionModules.SideButtons)
 local Stat = require(ReplicatedStorage.Shared.FusionModules.Stat)
@@ -13,13 +13,16 @@ local TopButton = require(ReplicatedStorage.Shared.FusionModules.TopButton)
 local TopFrame = require(ReplicatedStorage.Shared.FusionModules.TopButtons)
 local ImageIds = require(ReplicatedStorage.Shared.Modules.ImageIds)
 local Network = require(ReplicatedStorage.Shared.Modules.Network)
+local StateManager = require(ReplicatedStorage.Shared.Modules.StateManager)
 local Utils = require(ReplicatedStorage.Shared.Modules.Utils)
 
+local SettingsStates = StateManager:GetObj("Settings")
 local Children, OnEvent, peek = fusion.Children, fusion.OnEvent, fusion.peek
 
 local Scope = fusion.scoped(fusion)
 
 local module = {}
+local Frames = {}
 
 local Money = Scope:Value(0)
 local Gem = Scope:Value(0)
@@ -63,9 +66,58 @@ local TopButtons = Scope:Hydrate(TopFrame(Scope))({
 	[Children] = { ToPlot, ToShop },
 })
 
+local MusicValue, MusicSetting = Setting(Scope, "Slider")
+MusicSetting.Frame.Icon.Image = ImageIds.Music
+local SoundValue, SoundSetting = Setting(Scope, "Slider")
+
+Scope:Observer(SoundValue):onBind(function()
+	SettingsStates:SetState("Sound", peek(SoundValue))
+end)
+Scope:Observer(MusicValue):onBind(function()
+	SettingsStates:SetState("Music", peek(MusicValue))
+end)
+
+local SettingsVisible = Scope:Value(false)
+
+Frames.SettingsFrame = {
+	Frame = Scope:Hydrate(SettingsFrame(Scope))({
+		Size = Scope:Spring(
+			Scope:Computed(function(use)
+				return use(SettingsVisible) and UDim2.fromScale(0.5, 0.5) or UDim2.fromScale(0, 0)
+			end),
+			20
+		),
+		Position = Scope:Spring(
+			Scope:Computed(function(use)
+				return use(SettingsVisible) and UDim2.fromScale(0.5, 0.5) or UDim2.fromScale(0.5, 1.2)
+			end),
+			20
+		),
+	}),
+	Visible = SettingsVisible,
+}
+
+Scope:Hydrate(Frames.SettingsFrame.Frame.Settings)({
+	[Children] = {
+		MusicSetting,
+		SoundSetting,
+	},
+})
+
 local Shop = SideButton(Scope)
+Shop.ButtonName.Text = "Shop"
+Shop.Icon.Image = ImageIds.Shop2
 local Index = SideButton(Scope)
+Index.ButtonName.Text = "Index"
+Index.Icon.Image = ImageIds.Index2
 local Settings = SideButton(Scope)
+Settings.ButtonName.Text = "Settings"
+Settings.Icon.Image = ImageIds.Settings2
+Scope:Hydrate(Settings.Button)({
+	[OnEvent("MouseButton1Click")] = function()
+		SettingsVisible:set(not peek(SettingsVisible))
+	end,
+})
 
 local SideButtons = Scope:Hydrate(SideFrame(Scope))({
 	[Children] = { Shop, Index, Settings },
@@ -81,45 +133,17 @@ function module:Start()
 	Money:set(Utils.en(Data.Profile.Money))
 	Gem:set(Utils.en(Data.Profile.Gems))
 
-	local FrameVisible = Scope:Value(false)
-	local Frame = Scope:Value()
 	Scope:New("ScreenGui")({
 		Parent = Players.LocalPlayer.PlayerGui,
 		IgnoreGuiInset = true,
 		[Children] = {
-			Frame,
 			Stats,
 			TopButtons,
 			SideButtons,
+			Frames.SettingsFrame.Frame,
+			ShopFrame(Scope),
 		},
 	})
-
-	Frame:set(Scope:Hydrate(FrameModule(Scope))({
-		Size = Scope:Spring(
-			Scope:Computed(function(use)
-				return use(FrameVisible) and UDim2.fromScale(0.5, 0.5) or UDim2.fromScale(0, 0)
-			end),
-			20
-		),
-		Position = Scope:Spring(
-			Scope:Computed(function(use)
-				return use(FrameVisible) and UDim2.fromScale(0.5, 0.5) or UDim2.fromScale(0.5, 1.2)
-			end),
-			20
-		),
-	}))
-
-	Scope:Hydrate(peek(Frame).Close)({
-		[OnEvent("MouseButton1Click")] = function()
-			FrameVisible:set(false)
-		end,
-	})
-
-	UserInputService.InputBegan:Connect(function(input)
-		if input.KeyCode == Enum.KeyCode.G then
-			FrameVisible:set(not peek(FrameVisible))
-		end
-	end)
 end
 
 return module

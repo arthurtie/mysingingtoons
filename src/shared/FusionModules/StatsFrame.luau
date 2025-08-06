@@ -5,7 +5,7 @@ local fusion = require(ReplicatedStorage.Packages.fusion)
 return function(Scope: fusion.Scope<typeof(fusion)>)
 	return Scope:New("Frame")({
 		AnchorPoint = Vector2.new(0, 0.5),
-		Position = UDim2.fromScale(0, 0.92),
+		Position = UDim2.fromScale(0, 0.98),
 		Size = UDim2.fromScale(0.3, 0.5),
 		BackgroundTransparency = 1,
 		[fusion.Children] = {
