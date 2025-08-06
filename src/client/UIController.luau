@@ -5,6 +5,8 @@ local DataController = require(script.Parent.DataController)
 local fusion = require(ReplicatedStorage.Packages.fusion)
 local CloseButton = require(ReplicatedStorage.Shared.FusionModules.CloseButton)
 local FrameModule = require(ReplicatedStorage.Shared.FusionModules.Frame)
+local SideButton = require(ReplicatedStorage.Shared.FusionModules.SideButton)
+local SideFrame = require(ReplicatedStorage.Shared.FusionModules.SideButtons)
 local Stat = require(ReplicatedStorage.Shared.FusionModules.Stat)
 local StatsFrame = require(ReplicatedStorage.Shared.FusionModules.StatsFrame)
 local TopButton = require(ReplicatedStorage.Shared.FusionModules.TopButton)
@@ -61,6 +63,14 @@ local TopButtons = Scope:Hydrate(TopFrame(Scope))({
 	[Children] = { ToPlot, ToShop },
 })
 
+local Shop = SideButton(Scope)
+local Index = SideButton(Scope)
+local Settings = SideButton(Scope)
+
+local SideButtons = Scope:Hydrate(SideFrame(Scope))({
+	[Children] = { Shop, Index, Settings },
+})
+
 function module:Start()
 	DataController:Subscribe(function(data)
 		Money:set(Utils.en(data.Profile.Money))
@@ -80,6 +90,7 @@ function module:Start()
 			Frame,
 			Stats,
 			TopButtons,
+			SideButtons,
 		},
 	})
 
