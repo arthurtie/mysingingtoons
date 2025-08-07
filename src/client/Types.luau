@@ -1,8 +1,8 @@
 local ReplicaClient = require(script.Parent.ReplicaClient)
 export type PlacementController = {
-	StopPlacing: () -> (),
-	StartPlacing: () -> (),
-	Place: () -> (),
+	StopPlacing: (PlacementController) -> (),
+	StartPlacing: (PlacementController) -> (),
+	Place: (PlacementController) -> (),
 	Currentid: number,
 	Instance: Model?,
 	Rotation: number,
@@ -16,6 +16,13 @@ export type DataController = {
 	Replica: ReplicaClient.Replica,
 	Subscribe: (DataController, (PlayerObj) -> ()) -> () -> (),
 	Subscribtions: { (any) -> () },
+}
+
+export type MusicController = {
+	Loaded: { Sound },
+	SongStart: number,
+	Start: (DataController) -> (),
+	LoadMusic: (MusicController, PlayerObj) -> (),
 }
 export type PlayerObj = {
 	Profile: {

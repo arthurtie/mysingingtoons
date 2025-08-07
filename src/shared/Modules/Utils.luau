@@ -170,6 +170,7 @@ function Utils.HasProperty(Instance, Property)
 	return Succ
 end
 
+--Rolls a random value in the table value needs to have a Weight:Number parameter
 function Utils.Roll(Table, Luck)
 	Luck = 1 + ((Luck or 0) / 10)
 
@@ -264,4 +265,4 @@ RunService.Heartbeat:Connect(function(delta)
 	end
 end)
 
-return Utils
+return Utils :: typeof(Utils)

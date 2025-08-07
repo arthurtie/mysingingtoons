@@ -13,7 +13,7 @@ local ServiceNetwork = Network.new("PlayerService")
 ServiceNetwork:AddRE("Update")
 local Store = profilestore.New("0.0.3", {
 	Money = 25,
-	Inventory = { { id = 1, Type = "Character" } },
+	Inventory = { { id = 1, Type = "Character" }, { id = 2, Type = "Character" } },
 	PlacedPots = {},
 	Characters = {},
 	Rebirth = 0,
@@ -58,22 +58,39 @@ local function UpdateLeaderboardStats()
 	end
 end
 
+function Service:AddTool(Player, Model, Type)
+	if not Model then
+		return
+	end
+	Model = Model:Clone()
+
+	local Tool = Instance.new("Tool")
+	Model.Parent = Tool
+	Model.PrimaryPart.Name = "handle"
+	Model.PrimaryPart.Anchored = false
+	local Handle = Instance.new("Part")
+	Handle.Name = "Handle"
+	Handle.Parent = Tool
+	Handle.Transparency = 1
+	local Weld = Instance.new("Weld")
+	Weld.Part0 = Handle
+	Weld.Part1 = Model.PrimaryPart
+	Weld.Parent = Handle
+	Tool.Name = Model.Name
+	Tool.Parent = Player.Backpack
+	for _, v in Tool:GetDescendants() do
+		if v:IsA("BasePart") then
+			v.CanCollide = false
+		end
+	end
+	Tool:SetAttribute("Type", Type)
+end
+
 function Service:LoadInventory(Player)
 	local Obj = Service:GetPlayer(Player)
-	print(Obj)
 	for _, v in Obj.Profile.Data.Inventory do
 		local Model = ReplicatedStorage.Assets[v.Type]:FindFirstChild(v.id)
-		if not Model then
-			return
-		end
-		Model = Model:Clone()
-
-		local Tool = Instance.new("Tool")
-		Model.Parent = Tool
-		Model.PrimaryPart.Name = "Handle"
-		Model.PrimaryPart.Anchored = false
-		Tool.Name = v.id
-		Tool.Parent = Player.Backpack
+		Service:AddTool(Player, Model, v.Type)
 	end
 end
 
@@ -139,8 +156,10 @@ function Service:LoadPlayer(Player)
 	Service.Profiles[Player.UserId].Replica:Subscribe(Player)
 
 	self.Profiles[Player.UserId]:Update()
-	print(Profile.Data.Inventory)
 	Service:LoadInventory(Player)
+	Player.CharacterAdded:Connect(function()
+		Service:LoadInventory(Player)
+	end)
 
 	return self.Profiles[Player.UserId]
 end

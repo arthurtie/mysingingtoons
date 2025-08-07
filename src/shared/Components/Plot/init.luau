@@ -1,14 +1,17 @@
---!strict
 local CollectionService = game:GetService("CollectionService")
-local ExperienceStateRecordingService = game:GetService("ExperienceStateRecordingService")
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 local ServerScriptService = game:GetService("ServerScriptService")
+local TweenService = game:GetService("TweenService")
+local Settings = require(ReplicatedStorage.Shared.Modules.Settings)
+local Utils = require(ReplicatedStorage.Shared.Modules.Utils)
 local PlayerService = require(ServerScriptService.Server.PlayerService)
 local GameService = require(ServerScriptService.Server.GameService)
 local Types = require(ServerScriptService.Server.Types)
+local SharedTypes = require(ReplicatedStorage.Shared.Modules.Types)
 local CharComp = require(script.Character)
+local Egg = require(script.Egg)
 local Component = {} :: Types.TycoonComp
 Component.__index = Component
 
@@ -73,7 +76,7 @@ function Component:Claim(plr)
 	obj.Tycoon = self
 	for _, v in obj.Profile.Data.Characters do
 		local CFrame = CFrame.new(table.unpack(v.CFrame))
-		self:AddCharacter(v.id, CFrame)
+		self:AddCharacter(v.id, CFrame, v.Type)
 	end
 
 	repeat
@@ -96,7 +99,12 @@ end
 
 function Component:Income()
 	for _, v in self.Characters do
-		v.Money += v.Settings.Income
+		if v.Money then
+			v.Money += v.Settings.Income
+		else
+			v.Time += 1
+		end
+
 		v:Update()
 	end
 end
@@ -115,19 +123,67 @@ function Component:UnClaim()
 	self.Player = nil
 end
 
-function Component:AddCharacter(id, CF)
-	local Instance = ReplicatedStorage.Assets.Character:FindFirstChild(id)
+function Component:AddCharacter(id, CF, Type)
+	print(Type)
+	local Instance = ReplicatedStorage.Assets[Type]:FindFirstChild(id)
 	if not Instance then
 		return
 	end
 	local _, Size = Instance:GetBoundingBox()
 	CF = self.Instance.Base.CFrame:ToWorldSpace(CF)
-	local YPos = self.Instance.Base.Position.Y + Size.Y * 0.5
-	CF = CFrame.new(Vector3.new(math.round(CF.Position.X), YPos, math.round(CF.Position.Z))) * CF.Rotation
-	local NewCharacter = CharComp.new(self, id, CF)
+	local YPos = self.Instance.Base.Size.Y + Size.Y * 0.5
+	CF = CFrame.new(Vector3.new(math.round(CF.Position.X), YPos, math.round(CF.Position.Z)))
+		* CFrame.Angles(CF.Rotation.X, 0, 0)
+	local NewCharacter = Type == "Character" and CharComp.new(self, id, CF) or Egg.new(self, id, CF)
 	if NewCharacter then
 		table.insert(self.Characters, NewCharacter)
 	end
+
+	return true, self.Instance.Base.CFrame:ToObjectSpace(CF)
+end
+
+function Component:Pickup(Instance)
+	for i, v in self.Characters do
+		if v.Instance == Instance then
+			v:Destroy()
+			table.remove(self.Characters, i)
+			break
+		end
+	end
+end
+function Component:SpawnEgg(ForcedEgg)
+	local Egg
+	if not ForcedEgg then
+		Egg = Utils.Roll(Settings.Egg, 1) :: SharedTypes.EggSettings
+	else
+		Egg = ForcedEgg
+	end
+	local Model = ReplicatedStorage.Assets.Egg:FindFirstChild(Egg.id)
+	if not Model then
+		return
+	end
+	Model = Model:Clone()
+	Model.Parent = self.Instance.Eggs
+	Model:PivotTo(self.Instance.Conveyor.Begin:GetPivot())
+	Utils.TweenModel(self.Instance.Conveyor.End:GetPivot(), TweenInfo.new(15, Enum.EasingStyle.Linear), Model).Completed
+		:Connect(function()
+			Model:Destroy()
+		end)
+	local Prompt = Instance.new("ProximityPrompt")
+	Prompt.Name = "Buy"
+	Prompt.ActionText = "$" .. Utils.en(Egg.Price)
+	Prompt.ObjectText = "Buy"
+	Prompt.Parent = Model.PrimaryPart
+	Prompt.RequiresLineOfSight = false
+	Prompt.HoldDuration = 1
+	Prompt.Triggered:Connect(function(plr)
+		if plr.UserId == self.Player then
+			Prompt:Destroy()
+			table.insert(PlayerService:GetPlayer(plr), { id = Egg.id, Type = "Egg" })
+			PlayerService:AddTool(plr, Model, "Egg")
+			Model:Destroy()
+		end
+	end)
 end
 
 workspace.DescendantAdded:Connect(function(instance)

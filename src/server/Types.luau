@@ -12,8 +12,10 @@ export type TycoonComp = {
 	Claim: (Tycoon, Player) -> (),
 	UnClaim: (Tycoon) -> (),
 	new: (typeof(workspace.Plots["1"])) -> Tycoon,
-	AddCharacter: (Tycoon, number, CFrame) -> (),
+	AddCharacter: (Tycoon, number, CFrame, string) -> (),
 	Income: (Tycoon) -> (),
+	Pickup: (Tycoon, Instance) -> (),
+	SpawnEgg: (Tycoon, Types.EggSettings) -> (),
 }
 
 export type Tycoon = typeof(setmetatable(
@@ -21,7 +23,7 @@ export type Tycoon = typeof(setmetatable(
 		Claimed: boolean,
 		Player: number?,
 		Instance: typeof(workspace.Plots["1"]),
-		Characters: { Character },
+		Characters: { Character | Egg },
 		HitBox: Part,
 	},
 	{} :: TycoonComp
@@ -41,6 +43,19 @@ export type Character = typeof(setmetatable(
 	{} :: CharacterComp
 ))
 
+export type EggComp = {
+	__index: EggComp,
+	Destroy: (Egg) -> (),
+	new: (Tycoon, number, CFrame) -> Egg?,
+	Update: (Egg) -> (),
+	UnBox: (Character) -> (),
+}
+
+export type Egg = typeof(setmetatable(
+	{} :: { UI: any, Tycoon: Tycoon, Instance: Instance, Settings: Types.EggSettings, Time: number },
+	{} :: EggComp
+))
+
 export type PlayerObj = {
 	Profile: {
 		Data: {
@@ -50,7 +65,7 @@ export type PlayerObj = {
 			Rebirth: number,
 			Inventory: {},
 			PlacedPots: {},
-			Characters: { { id: number, CFrame: typeof({ CFrame.new():GetComponents() }) } },
+			Characters: { { id: number, CFrame: typeof({ CFrame.new():GetComponents() }), Type: string } },
 			Index: {},
 			PlayTime: number,
 			LastSeen: number,
@@ -77,13 +92,14 @@ export type PlayerService = {
 	Remove: (PlayerService, Player) -> (),
 	Start: (PlayerService) -> (),
 	LoadInventory: (PlayerService, Player) -> (),
+	AddTool: (PlayerService, Player, Model, string) -> (),
 }
 export type GameService = {
 	Plots: { Tycoon },
 	Network: NetWork.Network,
 	Start: (PlayerService) -> (),
 	PlaceObject: (Player, number, CFrame) -> (),
-	RemoveObject: (Player, number) -> (),
+	PickupObject: (Player, Instance) -> (),
 }
 
 return module

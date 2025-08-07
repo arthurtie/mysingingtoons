@@ -1,0 +1,63 @@
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local RunService = game:GetService("RunService")
+local SoundService = game:GetService("SoundService")
+local DataController = require(script.Parent.DataController)
+local SoundIds = require(ReplicatedStorage.Shared.Modules.SoundIds)
+local Types = require(script.Parent.Types)
+local SongLength = 10
+local TimeStamp = 0
+local module = { Loaded = {}, SongStart = tick() } :: Types.MusicController
+
+function module:Start()
+	Instance.new("Folder", SoundService).Name = "Music"
+	DataController:Subscribe(function(data)
+		module:LoadMusic(data)
+	end)
+end
+
+function module:LoadMusic(data)
+	for i, Sound in module.Loaded do
+		local Found = false
+		for _, v in data.Profile.Characters do
+			if v.id == tonumber(Sound.Name) then
+				Found = true
+				break
+			end
+		end
+
+		if not Found then
+			table.remove(module.Loaded, i)
+			Sound:Destroy()
+		end
+	end
+	for _, v in data.Profile.Characters do
+		print(module.Loaded)
+		if module.Loaded[v.id] then
+			continue
+		end
+
+		local Sound = Instance.new("Sound")
+		Sound.SoundId = SoundIds.Test[v.id]
+		Sound.Parent = SoundService.Music
+		Sound.TimePosition = TimeStamp
+		print(TimeStamp)
+		Sound:Play()
+		Sound.Name = v.id
+		module.Loaded[v.id] = Sound
+	end
+end
+
+RunService.Heartbeat:Connect(function(dt)
+	TimeStamp += dt
+	if tick() - module.SongStart > SongLength then
+		module.SongStart = tick()
+		TimeStamp = 0
+		for _, v in module.Loaded do
+			v.TimePosition = 0
+
+			task.spawn(v.Play, v)
+		end
+	end
+end)
+
+return module
