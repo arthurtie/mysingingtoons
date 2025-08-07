@@ -2,7 +2,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local fusion = require(ReplicatedStorage.Packages.fusion)
 
 return function(Scope, id)
-	local Clone = ReplicatedStorage.Assets.Characters:FindFirstChild(id)
+	local Clone = ReplicatedStorage.Assets.Character:FindFirstChild(id)
 	if not Clone then
 		return
 	end

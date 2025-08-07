@@ -1,4 +1,5 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local RunService = game:GetService("RunService")
 local ServerScriptService = game:GetService("ServerScriptService")
 local Workspace = game:GetService("Workspace")
 local Types = require(script.Parent.Types)
@@ -57,5 +58,20 @@ end)
 function Service:Start()
 	PlayerService = require(ServerScriptService.Server.PlayerService)
 end
+
+local IncomeDB = false
+
+RunService.Heartbeat:Connect(function()
+	if IncomeDB then
+		return
+	end
+	IncomeDB = true
+	task.delay(1, function()
+		IncomeDB = false
+	end)
+	for _, v in Service.Plots do
+		task.spawn(v.Income, v)
+	end
+end)
 
 return Service :: Types.GameService

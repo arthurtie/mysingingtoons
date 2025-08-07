@@ -1,7 +1,9 @@
 --!strict
 local CollectionService = game:GetService("CollectionService")
+local ExperienceStateRecordingService = game:GetService("ExperienceStateRecordingService")
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local RunService = game:GetService("RunService")
 local ServerScriptService = game:GetService("ServerScriptService")
 local PlayerService = require(ServerScriptService.Server.PlayerService)
 local GameService = require(ServerScriptService.Server.GameService)
@@ -92,6 +94,13 @@ function Component:Claim(plr)
 	return true
 end
 
+function Component:Income()
+	for _, v in self.Characters do
+		v.Money += v.Settings.Income
+		v:Update()
+	end
+end
+
 function Component:UnClaim()
 	if not self.Claimed then
 		return
@@ -107,7 +116,7 @@ function Component:UnClaim()
 end
 
 function Component:AddCharacter(id, CF)
-	local Instance = ReplicatedStorage.Assets.Characters:FindFirstChild(id)
+	local Instance = ReplicatedStorage.Assets.Character:FindFirstChild(id)
 	if not Instance then
 		return
 	end
@@ -130,5 +139,4 @@ end)
 for _, v in CollectionService:GetTagged("Plot") do
 	Component.new(v)
 end
-
 return Component

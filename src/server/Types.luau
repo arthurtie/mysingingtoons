@@ -13,6 +13,7 @@ export type TycoonComp = {
 	UnClaim: (Tycoon) -> (),
 	new: (typeof(workspace.Plots["1"])) -> Tycoon,
 	AddCharacter: (Tycoon, number, CFrame) -> (),
+	Income: (Tycoon) -> (),
 }
 
 export type Tycoon = typeof(setmetatable(
@@ -31,10 +32,12 @@ export type CharacterComp = {
 	Sell: (Character, Player) -> (),
 	Destroy: (Character) -> (),
 	new: (Tycoon, number, CFrame) -> Character?,
+	Update: (Character) -> (),
+	Collect: (Character, Player) -> (),
 }
 
 export type Character = typeof(setmetatable(
-	{} :: { Tycoon: Tycoon, Instance: Instance, Settings: Types.CharacterSettings },
+	{} :: { UI: any, Tycoon: Tycoon, Instance: Instance, Settings: Types.CharacterSettings, Money: number },
 	{} :: CharacterComp
 ))
 
@@ -73,6 +76,7 @@ export type PlayerService = {
 	GetPlayer: (PlayerService, Player | number) -> PlayerObj,
 	Remove: (PlayerService, Player) -> (),
 	Start: (PlayerService) -> (),
+	LoadInventory: (PlayerService, Player) -> (),
 }
 export type GameService = {
 	Plots: { Tycoon },

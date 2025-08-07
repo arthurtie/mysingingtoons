@@ -30,7 +30,7 @@ function PlacementController:StartPlacing(id)
 	if PlayerStates:GetState("Placing") then
 		PlayerStates:SetState("Placing", false)
 	end
-	local Instance = ReplicatedStorage.Assets.Characters:FindFirstChild(id)
+	local Instance = ReplicatedStorage.Assets.Character:FindFirstChild(id)
 	if not Instance then
 		return
 	end
@@ -90,14 +90,17 @@ RunService.Heartbeat:Connect(function()
 	Object:PivotTo(CFrame)
 end)
 
-Player.CharacterAdded:Connect(function()
-	Player.Backpack.ChildAdded:Connect(function()
-		PlayerStates:SetState("Placing", false)
-	end)
+repeat
+	task.wait()
+until Player.Character
 
-	Player.Backpack.ChildRemoved:Connect(function(child)
-		PlacementController:StartPlacing(child.Name)
-	end)
+Player.Backpack.ChildAdded:Connect(function()
+	PlayerStates:SetState("Placing", false)
+end)
+
+Player.Backpack.ChildRemoved:Connect(function(child)
+	print(child)
+	PlacementController:StartPlacing(child.Name)
 end)
 
 return PlacementController

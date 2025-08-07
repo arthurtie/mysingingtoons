@@ -11,9 +11,9 @@ local profilestore = require(ServerScriptService.Packages.ProfileStore)
 local GameService = {} :: Types.GameService
 local ServiceNetwork = Network.new("PlayerService")
 ServiceNetwork:AddRE("Update")
-local Store = profilestore.New("0.0.2", {
+local Store = profilestore.New("0.0.3", {
 	Money = 25,
-	Inventory = {},
+	Inventory = { { id = 1, Type = "Character" } },
 	PlacedPots = {},
 	Characters = {},
 	Rebirth = 0,
@@ -55,6 +55,25 @@ local function UpdateLeaderboardStats()
 
 	for index, statInfo in Profiles do
 		statInfo.MoneyStringValue.Value = `{zeroWidthSpace:rep(index - 1)}{Utils.en(statInfo.Money)}`
+	end
+end
+
+function Service:LoadInventory(Player)
+	local Obj = Service:GetPlayer(Player)
+	print(Obj)
+	for _, v in Obj.Profile.Data.Inventory do
+		local Model = ReplicatedStorage.Assets[v.Type]:FindFirstChild(v.id)
+		if not Model then
+			return
+		end
+		Model = Model:Clone()
+
+		local Tool = Instance.new("Tool")
+		Model.Parent = Tool
+		Model.PrimaryPart.Name = "Handle"
+		Model.PrimaryPart.Anchored = false
+		Tool.Name = v.id
+		Tool.Parent = Player.Backpack
 	end
 end
 
@@ -120,6 +139,8 @@ function Service:LoadPlayer(Player)
 	Service.Profiles[Player.UserId].Replica:Subscribe(Player)
 
 	self.Profiles[Player.UserId]:Update()
+	print(Profile.Data.Inventory)
+	Service:LoadInventory(Player)
 
 	return self.Profiles[Player.UserId]
 end
