@@ -58,6 +58,9 @@ function module:Start()
 	DataController:Subscribe(function(data)
 		Frames.Stats.Money:set(Utils.en(data.Profile.Money))
 		Frames.Stats.Gem:set(Utils.en(data.Profile.Gems))
+		for _, v in data.Profile.Index do
+			Frames.Index.Frames[v.id].CartoonImage.ImageColor3 = Color3.new(1, 1, 1)
+		end
 	end)
 
 	local Data = DataController:GetData()

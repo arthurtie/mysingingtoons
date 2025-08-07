@@ -6,6 +6,7 @@ function module:Init(Scope)
 	local Frame = IndexFrame(Scope)
 	module.Frame = Frame.Frame
 	module.Visible = Frame.Visible
+	module.Frames = Frame.Frames
 end
 
 return module

@@ -13,6 +13,7 @@ return function(Scope: fusion.Scope<typeof(fusion)>)
 	local Visible = Scope:Value(false)
 	return {
 		Visible = Visible,
+		Frames = ChildrenTable,
 		Frame = Scope:New("Frame")({
 			AnchorPoint = Vector2.new(0.5, 0.5),
 			Position = Scope:Spring(Scope:Computed(function(use)

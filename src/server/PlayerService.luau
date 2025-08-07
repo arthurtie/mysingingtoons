@@ -11,14 +11,14 @@ local profilestore = require(ServerScriptService.Packages.ProfileStore)
 local GameService = {} :: Types.GameService
 local ServiceNetwork = Network.new("PlayerService")
 ServiceNetwork:AddRE("Update")
-local Store = profilestore.New("0.0.1", {
+local Store = profilestore.New("0.0.2", {
 	Money = 25,
 	Inventory = {},
 	PlacedPots = {},
 	Characters = {},
 	Rebirth = 0,
 	Multiplier = 1,
-	Index = {},
+	Index = { { id = 1 } },
 	PlayTime = os.time(),
 	LastSeen = os.time(),
 	PlayTimeReward = false,
