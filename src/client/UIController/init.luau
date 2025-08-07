@@ -42,6 +42,16 @@ Scope:Hydrate(Frames.SideButtons.RobuxShop.Button)({
 		Frames.RobuxShop.Visible:set(not peek(Frames.RobuxShop.Visible))
 	end,
 })
+Scope:Hydrate(Frames.SideButtons.Index.Button)({
+	[OnEvent("MouseButton1Click")] = function()
+		for _, v in Frames do
+			if v ~= Frames.Index and v.Visible then
+				v.Visible:set(false)
+			end
+		end
+		Frames.Index.Visible:set(not peek(Frames.Index.Visible))
+	end,
+})
 
 --Subscribes to player data and renders ui
 function module:Start()

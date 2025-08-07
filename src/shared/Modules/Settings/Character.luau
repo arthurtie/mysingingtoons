@@ -8,7 +8,7 @@ Settings[1] = {
 Settings[2] = {
 	Name = "Donald",
 	Audio = 123456789,
-	id = 1,
+	id = 2,
 }
 
 return Settings
