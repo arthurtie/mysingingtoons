@@ -1,9 +1,13 @@
 --!strict
+local NetworkServer = game:GetService("NetworkServer")
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerScriptService = game:GetService("ServerScriptService")
+local GameService = require(ServerScriptService.Server.GameService)
+local Network = require(ReplicatedStorage.Shared.Modules.Network)
 local PlayerService = require(ServerScriptService.Server.PlayerService)
 local Settings = require(ReplicatedStorage.Shared.Modules.Settings)
+local Utils = require(ReplicatedStorage.Shared.Modules.Utils)
 local Types = require(ServerScriptService.Server.Types)
 local Component = {} :: Types.EggComp
 Component.__index = Component
@@ -21,9 +25,19 @@ local function CreateUI()
 	TimeLabel.Font = Enum.Font.FredokaOne
 	TimeLabel.TextScaled = true
 	TimeLabel.BackgroundTransparency = 1
-	TimeLabel.TextColor3 = Color3.fromRGB(0, 188, 0)
+	TimeLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
 	Instance.new("UIStroke", TimeLabel).Thickness = 2
 	return UI :: any
+end
+
+local function CreateProx()
+	local Proximity = Instance.new("ProximityPrompt")
+	Proximity.Enabled = false
+	Proximity.ObjectText = ""
+	Proximity.ActionText = "Hatch"
+	Proximity.HoldDuration = 0.5
+
+	return Proximity
 end
 
 function Component.new(Tycoon, id, CFrame)
@@ -34,15 +48,25 @@ function Component.new(Tycoon, id, CFrame)
 	Character = Character:Clone()
 	Character:PivotTo(CFrame)
 	Character.PrimaryPart.Anchored = true
+	Character:SetAttribute("Type", "Egg")
 	local Table = {
 		Instance = Character,
 		Tycoon = Tycoon,
 		Settings = Settings.Egg[tonumber(id)],
 		Time = 0,
 		UI = CreateUI(),
+		Proximity = CreateProx(),
 	}
-	Table.UI.Time.Text = "$" .. Table.Settings.Price .. "/s"
+
+	Table.UI.Time.Text = "Time: " .. Table.Settings.Time .. "s"
 	setmetatable(Table, Component)
+
+	Table.Proximity.Triggered:Connect(function(plr)
+		if plr.UserId ~= Table.Tycoon.Player or Table.Time < Table.Settings.Time then
+			return
+		end
+		Table:Hatch()
+	end)
 
 	local CF, Size = Character:GetBoundingBox()
 
@@ -61,6 +85,7 @@ function Component.new(Tycoon, id, CFrame)
 	UIPart.Anchored = true
 	UIPart.Transparency = 1
 	Table.UI.Parent = UIPart
+	Table.Proximity.Parent = Table.Instance.PrimaryPart
 
 	Table.Instance.Parent = Table.Tycoon.Instance.Characters
 
@@ -73,16 +98,46 @@ function Component.new(Tycoon, id, CFrame)
 	return Table :: Types.Egg
 end
 
-function Component:Destroy()
+function Component:Hatch()
+	local OutCome = Utils.Roll(self.Settings.RarityTable)
+	local Rarity = Settings.Rarity[OutCome.Name]
+
+	GameService:PlaceObject({
+		Player = Players:GetPlayerByUserId(self.Tycoon.Player),
+		id = Rarity.Characters[math.random(1, #Rarity.Characters)],
+		CFrame = self.Instance:GetPivot(),
+		Type = "Character",
+		Force = true,
+	})
+
+	Network:GetNetwork("GameService"):GetRE("Hatch"):Fire(self.Tycoon.Player, self.Settings)
+	self:Destroy(true)
+end
+
+function Component:Destroy(Hatch)
 	if self.Instance.Parent then
 		self.Instance:Destroy()
 	end
+
+	if Hatch then
+		for i, v in self.Tycoon.Characters do
+			if v.Instance == self.Instance then
+				table.remove(self.Tycoon.Characters, i)
+			end
+		end
+	end
+
 	for i, _ in pairs(self) do
 		self[i] = nil
 	end
 end
 
 function Component:Update()
+	if self.Time > self.Settings.Time then
+		self.Proximity.Enabled = true
+		self.UI.Time.Text = "Hatch!"
+		return
+	end
 	self.UI.Time.Text = "Time: " .. self.Settings.Time - self.Time .. "s"
 end
 

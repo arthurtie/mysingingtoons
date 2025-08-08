@@ -128,10 +128,10 @@ function Service:LoadPlayer(Player)
 		Profile = Profile,
 		Player = Player,
 		Leaderstats = Leaderstats,
-		Update = function(self)
+		Update = function(Obj)
 			UpdateLeaderboardStats()
 
-			self.Replica:SetValues({ "Profile" }, self.Profile.Data)
+			Obj.Replica:SetValues({ "Profile" }, Obj.Profile.Data)
 		end,
 		Friendlys = {},
 		Friends = {},
@@ -190,6 +190,18 @@ function Service:Start()
 		Service:LoadPlayer(v)
 	end
 	GameService = require(ServerScriptService.Server.GameService)
+end
+
+function Service:Index(plr, id)
+	local obj = Service:GetPlayer(plr)
+
+	for _, v in obj.Profile.Data.Index do
+		if v.id == id then
+			return
+		end
+	end
+
+	table.insert(obj.Profile.Data.Index, { id = id })
 end
 
 Players.PlayerAdded:Connect(function(plr)

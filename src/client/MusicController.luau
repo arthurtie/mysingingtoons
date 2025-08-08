@@ -3,9 +3,12 @@ local RunService = game:GetService("RunService")
 local SoundService = game:GetService("SoundService")
 local DataController = require(script.Parent.DataController)
 local SoundIds = require(ReplicatedStorage.Shared.Modules.SoundIds)
+local StateManager = require(ReplicatedStorage.Shared.Modules.StateManager)
 local Types = require(script.Parent.Types)
 local SongLength = 10
 local TimeStamp = 0
+local SettingsStates = StateManager:GetObj("Settings")
+SettingsStates:SetState("Music", 1)
 local module = { Loaded = {}, SongStart = tick() } :: Types.MusicController
 
 function module:Start()
@@ -14,6 +17,12 @@ function module:Start()
 		module:LoadMusic(data)
 	end)
 end
+
+SettingsStates:Subscribe("Music", function(value)
+	for _, v in module.Loaded do
+		v.Volume = value
+	end
+end)
 
 function module:LoadMusic(data)
 	for i, Sound in module.Loaded do
@@ -31,7 +40,9 @@ function module:LoadMusic(data)
 		end
 	end
 	for _, v in data.Profile.Characters do
-		print(module.Loaded)
+		if v.Type == "Egg" then
+			continue
+		end
 		if module.Loaded[v.id] then
 			continue
 		end
@@ -43,6 +54,7 @@ function module:LoadMusic(data)
 		print(TimeStamp)
 		Sound:Play()
 		Sound.Name = v.id
+		Sound.Volume = SettingsStates:GetState("Music")
 		module.Loaded[v.id] = Sound
 	end
 end

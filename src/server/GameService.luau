@@ -22,10 +22,15 @@ local function Collision(id, CFrame, Type)
 	return false
 end
 
-function Service:PlaceObject(plr, id, CFrame, Type)
+function Service:PlaceObject(Params)
+	local plr = Params.Player
+	local id = Params.id
+	local CFrame = Params.CFrame
+	local Type = Params.Type
+	local Force = Params.Force
 	id = tonumber(id)
 
-	if Collision(id, CFrame, Type) then
+	if not Force and Collision(id, CFrame, Type) then
 		return
 	end
 
@@ -45,19 +50,20 @@ function Service:PlaceObject(plr, id, CFrame, Type)
 		return
 	end
 
-	local Found = false
+	if not Force then
+		local Found = false
 
-	for i, v in PlayerObj.Profile.Data.Inventory do
-		if v.id == id then
-			Found = true
-			table.remove(PlayerObj.Profile.Data.Inventory, i)
-			break
+		for i, v in PlayerObj.Profile.Data.Inventory do
+			if v.id == id and v.Type == Type then
+				Found = true
+				table.remove(PlayerObj.Profile.Data.Inventory, i)
+				break
+			end
 		end
-	end
-
-	if not Found then
-		print("Not in inv")
-		return
+		if not Found then
+			print("Not in inv")
+			return
+		end
 	end
 
 	CFrame = PlayerObj.Tycoon.Instance.Base.CFrame:ToObjectSpace(CFrame)
@@ -72,6 +78,7 @@ function Service:PlaceObject(plr, id, CFrame, Type)
 	end
 
 	table.insert(PlayerObj.Profile.Data.Characters, { id = id, Type = Type, CFrame = CF })
+	PlayerService:Index(plr, id)
 	PlayerObj:Update()
 end
 
@@ -82,7 +89,7 @@ function Service:PickupObject(plr, Instance)
 	end
 
 	PlayerService:AddTool(plr, ReplicatedStorage.Assets.Character[Instance.Name])
-	table.insert(obj.Profile.Data.Inventory, { id = tonumber(Instance.Name), Type = "Character" })
+	table.insert(obj.Profile.Data.Inventory, { id = tonumber(Instance.Name), Type = Instance:GetAttribute("Type") })
 	obj.Tycoon:Pickup(Instance)
 
 	local CF = obj.Tycoon.Instance.Base.CFrame:ToObjectSpace(Instance:GetPivot())
@@ -99,13 +106,15 @@ end
 local _, PlaceRE = Service.Network:AddRE("Place")
 PlaceRE:Connect(function(plr, id, CFrame, Type)
 	print(Type)
-	Service:PlaceObject(plr, id, CFrame, Type)
+	Service:PlaceObject({ Player = plr, id = id, CFrame = CFrame, Type = Type })
 end)
 
 local _, PickupRE = Service.Network:AddRE("Pickup")
 PickupRE:Connect(function(plr, Instance)
 	Service:PickupObject(plr, Instance)
 end)
+
+Service.Network:AddRE("Hatch")
 
 local _, TeleportRE = Service.Network:AddRE("Teleport")
 TeleportRE:Connect(function(plr, Destination)

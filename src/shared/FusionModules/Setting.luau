@@ -5,7 +5,7 @@ local UserInputService = game:GetService("UserInputService")
 
 local fusion = require(ReplicatedStorage.Packages.fusion)
 
-return function(Scope: fusion.Scope<typeof(fusion)>, Type: string)
+return function(Scope: fusion.Scope<typeof(fusion)>, Type: string, Props)
 	if Type == "Switch" then
 		local ButtonSize = Scope:Value(UDim2.fromScale(0.5, 1))
 		local SwitchValue = Scope:Value(true)
@@ -38,7 +38,7 @@ return function(Scope: fusion.Scope<typeof(fusion)>, Type: string)
 							}),
 							Scope:New("TextLabel")({
 								Name = "Value",
-								Text = "Placeholder setting",
+								Text = Props.Title or "Placeholder",
 								Font = Enum.Font.FredokaOne,
 								TextColor3 = Color3.fromRGB(255, 255, 255),
 								TextScaled = true,
@@ -187,7 +187,7 @@ return function(Scope: fusion.Scope<typeof(fusion)>, Type: string)
 							}),
 							Scope:New("TextLabel")({
 								Name = "Value",
-								Text = "Placeholder setting",
+								Text = Props.Title or "Placeholder",
 								Font = Enum.Font.FredokaOne,
 								TextColor3 = Color3.fromRGB(255, 255, 255),
 								TextScaled = true,

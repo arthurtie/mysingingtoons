@@ -1,4 +1,5 @@
 --!strict
+local Players = game:GetService("Players")
 local Types = require(script.Parent.Types)
 
 local Module = {} :: Types.EventModule
@@ -23,6 +24,8 @@ function Module.new(RemoteEvent)
 end
 
 function Module:Fire(Player, ...)
+	Player = typeof(Player) ~= Player and Players:GetPlayerByUserId(Player) or Player
+
 	if not Player or not Player:IsA("Player") then
 		return
 	end

@@ -56,6 +56,7 @@ function Component.new(Tycoon, id, CFrame)
 	Character = Character:Clone()
 	Character:PivotTo(CFrame)
 	Character.PrimaryPart.Anchored = true
+	Character:SetAttribute("Type", "Character")
 	local Table = {
 		Instance = Character,
 		Tycoon = Tycoon,

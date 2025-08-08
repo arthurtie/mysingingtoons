@@ -6,7 +6,6 @@ local ImageIds = require(ReplicatedStorage.Shared.Modules.ImageIds)
 local StateManager = require(ReplicatedStorage.Shared.Modules.StateManager)
 local SettingsStates = StateManager:GetObj("Settings")
 local Children, peek = fusion.Children, fusion.peek
-
 local module = {}
 
 function module:Init(Scope)
@@ -14,9 +13,9 @@ function module:Init(Scope)
 	module.Frame = Frame.Frame
 	module.Visible = Frame.Visible
 
-	local MusicValue, MusicSetting = Setting(Scope, "Slider")
+	local MusicValue, MusicSetting = Setting(Scope, "Slider", { Title = "Music" })
 	MusicSetting.Frame.Icon.Image = ImageIds.Music
-	local SoundValue, SoundSetting = Setting(Scope, "Slider")
+	local SoundValue, SoundSetting = Setting(Scope, "Slider", { Title = "Sound" })
 	Scope:Observer(SoundValue):onBind(function()
 		SettingsStates:SetState("Sound", peek(SoundValue))
 	end)

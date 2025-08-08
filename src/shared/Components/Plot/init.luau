@@ -179,7 +179,7 @@ function Component:SpawnEgg(ForcedEgg)
 	Prompt.Triggered:Connect(function(plr)
 		if plr.UserId == self.Player then
 			Prompt:Destroy()
-			table.insert(PlayerService:GetPlayer(plr), { id = Egg.id, Type = "Egg" })
+			table.insert(PlayerService:GetPlayer(plr).Profile.Data.Inventory, { id = Egg.id, Type = "Egg" })
 			PlayerService:AddTool(plr, Model, "Egg")
 			Model:Destroy()
 		end

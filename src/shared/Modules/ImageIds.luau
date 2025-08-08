@@ -14,4 +14,5 @@ module.GamePassCash = "rbxassetid://81502278973036"
 module.GamePassLuck = "rbxassetid://114924933384853"
 module.GamePassSize = "rbxassetid://80866123861989"
 module.GamePassBG = "rbxassetid://114042817823047"
+module.Studs = "rbxassetid://117199751407660"
 return module :: typeof(module)

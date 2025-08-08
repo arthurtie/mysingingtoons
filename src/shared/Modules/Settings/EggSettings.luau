@@ -5,8 +5,13 @@ module[1] = {
 	id = 1,
 	Price = 50,
 	Weight = 50,
-	Time = 60,
-	RarityTable = { Common = 60, Uncommon = 30, Rare = 9, Epic = 1 },
+	Time = 10,
+	RarityTable = {
+		{ Name = "Common", Weight = 60 },
+		{ Name = "Uncommon", Weight = 30 },
+		{ Name = "Rare", Weight = 9 },
+		{ Name = "Epic", Weight = 1 },
+	},
 }
 
 return module

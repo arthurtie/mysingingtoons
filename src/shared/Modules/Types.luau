@@ -12,7 +12,7 @@ export type EggSettings = {
 	id: number,
 	Price: number,
 	Weight: number,
-	RarityTable: { [string]: string },
+	RarityTable: { { Name: string, Weight: number } },
 	Time: number,
 }
 

@@ -45,14 +45,21 @@ export type Character = typeof(setmetatable(
 
 export type EggComp = {
 	__index: EggComp,
-	Destroy: (Egg) -> (),
+	Destroy: (Egg, boolean?) -> (),
 	new: (Tycoon, number, CFrame) -> Egg?,
 	Update: (Egg) -> (),
-	UnBox: (Character) -> (),
+	Hatch: (Egg) -> (),
 }
 
 export type Egg = typeof(setmetatable(
-	{} :: { UI: any, Tycoon: Tycoon, Instance: Instance, Settings: Types.EggSettings, Time: number },
+	{} :: {
+		UI: any,
+		Tycoon: Tycoon,
+		Instance: Model,
+		Settings: Types.EggSettings,
+		Time: number,
+		Proximity: ProximityPrompt,
+	},
 	{} :: EggComp
 ))
 
@@ -93,13 +100,14 @@ export type PlayerService = {
 	Start: (PlayerService) -> (),
 	LoadInventory: (PlayerService, Player) -> (),
 	AddTool: (PlayerService, Player, Model, string) -> (),
+	Index: (PlayerService, number) -> (),
 }
 export type GameService = {
 	Plots: { Tycoon },
 	Network: NetWork.Network,
 	Start: (PlayerService) -> (),
-	PlaceObject: (Player, number, CFrame) -> (),
-	PickupObject: (Player, Instance) -> (),
+	PlaceObject: (GameService, { Player: Player, id: number, CFrame: CFrame, Type: string, Force: boolean? }) -> (),
+	PickupObject: (GameService, Player, Model) -> (),
 }
 
 return module
