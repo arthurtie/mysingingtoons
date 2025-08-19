@@ -121,7 +121,7 @@ function Component:Update()
 end
 
 function Component:Collect(Player)
-	if not Player or Player.UserId ~= self.Tycoon.Player then
+	if not Player or Player.UserId ~= self.Tycoon.Player or self.Money < 1 then
 		return
 	end
 	local Obj = PlayerService:GetPlayer(Player)

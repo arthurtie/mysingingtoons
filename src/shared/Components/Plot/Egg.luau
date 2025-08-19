@@ -115,9 +115,7 @@ function Component:Hatch()
 end
 
 function Component:Destroy(Hatch)
-	if self.Instance.Parent then
-		self.Instance:Destroy()
-	end
+	local obj = PlayerService:GetPlayer(self.Tycoon.Player)
 
 	if Hatch then
 		for i, v in self.Tycoon.Characters do
@@ -125,6 +123,19 @@ function Component:Destroy(Hatch)
 				table.remove(self.Tycoon.Characters, i)
 			end
 		end
+		local CF = obj.Tycoon.Instance.Base.CFrame:ToObjectSpace(self.Instance:GetPivot())
+
+		for i, v in obj.Profile.Data.Characters do
+			if v.CFrame == CF then
+				table.remove(obj.Profile.Data.Characters, i)
+				break
+			end
+		end
+		obj:Update()
+	end
+
+	if self.Instance.Parent then
+		self.Instance:Destroy()
 	end
 
 	for i, _ in pairs(self) do

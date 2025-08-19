@@ -11,14 +11,13 @@ local profilestore = require(ServerScriptService.Packages.ProfileStore)
 local GameService = {} :: Types.GameService
 local ServiceNetwork = Network.new("PlayerService")
 ServiceNetwork:AddRE("Update")
-local Store = profilestore.New("0.0.3", {
+local Store = profilestore.New("0.0.1", {
 	Money = 25,
 	Inventory = { { id = 1, Type = "Character" }, { id = 2, Type = "Character" } },
-	PlacedPots = {},
 	Characters = {},
 	Rebirth = 0,
 	Multiplier = 1,
-	Index = { { id = 1 } },
+	Index = {},
 	PlayTime = os.time(),
 	LastSeen = os.time(),
 	PlayTimeReward = false,
@@ -26,6 +25,7 @@ local Store = profilestore.New("0.0.3", {
 	Tutorial = 0,
 	Gems = 0,
 	Tools = { "Bat" },
+	Boosts = {},
 })
 
 local Service = {
@@ -202,6 +202,12 @@ function Service:Index(plr, id)
 	end
 
 	table.insert(obj.Profile.Data.Index, { id = id })
+end
+
+function Service:Boost(Player, Boost, Duration)
+	local obj = Service:GetPlayer(Player)
+
+	table.insert(obj.Profile.Data.Boosts, { Boost = Boost, Duration = Duration, Start = os.time() })
 end
 
 Players.PlayerAdded:Connect(function(plr)

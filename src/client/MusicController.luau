@@ -25,25 +25,23 @@ SettingsStates:Subscribe("Music", function(value)
 end)
 
 function module:LoadMusic(data)
+	print(data, module.Loaded)
 	for i, Sound in module.Loaded do
 		local Found = false
 		for _, v in data.Profile.Characters do
-			if v.id == tonumber(Sound.Name) then
+			if v.Type == "Character" and v.id == tonumber(Sound.Name) then
 				Found = true
 				break
 			end
 		end
 
 		if not Found then
-			table.remove(module.Loaded, i)
+			module.Loaded[i] = nil
 			Sound:Destroy()
 		end
 	end
 	for _, v in data.Profile.Characters do
-		if v.Type == "Egg" then
-			continue
-		end
-		if module.Loaded[v.id] then
+		if module.Loaded[v.id] or v.Type ~= "Character" then
 			continue
 		end
 
@@ -59,7 +57,7 @@ function module:LoadMusic(data)
 	end
 end
 
-RunService.Heartbeat:Connect(function(dt)
+RunService.RenderStepped:Connect(function(dt)
 	TimeStamp += dt
 	if tick() - module.SongStart > SongLength then
 		module.SongStart = tick()

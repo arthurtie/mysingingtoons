@@ -22,7 +22,10 @@ local function Collision(id, CFrame, Type)
 	return false
 end
 
-function Service:PlaceObject(Params)
+--Places an egg or character in players plot
+function Service:PlaceObject(
+	Params: { CFrame: CFrame, Force: boolean?, Player: Player | number, id: number, Type: string }
+): ()
 	local plr = Params.Player
 	local id = Params.id
 	local CFrame = Params.CFrame
@@ -82,13 +85,18 @@ function Service:PlaceObject(Params)
 	PlayerObj:Update()
 end
 
-function Service:PickupObject(plr, Instance)
+--picks up placed character and puts it in inventory
+function Service:PickupObject(plr: Player | number, Instance: Model): ()
 	local obj = PlayerService:GetPlayer(plr)
 	if not Instance or Instance.Parent ~= obj.Tycoon.Instance.Characters then
 		return
 	end
 
-	PlayerService:AddTool(plr, ReplicatedStorage.Assets.Character[Instance.Name])
+	PlayerService:AddTool(
+		plr,
+		ReplicatedStorage.Assets[Instance:GetAttribute("Type")][Instance.Name],
+		Instance:GetAttribute("Type")
+	)
 	table.insert(obj.Profile.Data.Inventory, { id = tonumber(Instance.Name), Type = Instance:GetAttribute("Type") })
 	obj.Tycoon:Pickup(Instance)
 
@@ -129,6 +137,7 @@ TeleportRE:Connect(function(plr, Destination)
 	end
 end)
 
+--Starts service should only be called from the server script
 function Service:Start()
 	PlayerService = require(ServerScriptService.Server.PlayerService)
 end

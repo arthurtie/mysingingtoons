@@ -124,7 +124,6 @@ function Component:UnClaim()
 end
 
 function Component:AddCharacter(id, CF, Type)
-	print(Type)
 	local Instance = ReplicatedStorage.Assets[Type]:FindFirstChild(id)
 	if not Instance then
 		return
